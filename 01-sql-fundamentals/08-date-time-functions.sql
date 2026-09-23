@@ -124,3 +124,146 @@ GROUP BY DATENAME(month,OrderDate)
 SELECT*
 FROM Sales.Orders
 WHERE MONTH(OrderDate)=2
+
+.................................................................................
+.................................................................................
+DATA TYPE CONVERSION & DATE CALCULATIONS
+/*CONVERT()
+  converts a date or time value to a diffferent data type
+  syntax
+  CONVERT(data_type,value,[,style])
+  examples
+  CONVERT(INT,'1234')
+  CONVERT(VARCHAR, OrderDate, '34')
+  */
+  SELECT
+  CONVERT(INT,'123')AS[String to Int CONVERT],
+  CONVERT(DATE,'2025-08-20')AS[String to Date CONVERT];
+
+
+  SELECT
+  CreationTime,
+  CONVERT(DATE, CreationTime)AS[Datetime to Date CONVERT]
+  FROM Sales.Orders;
+
+  SELECT
+  CreationTime,
+  CONVERT(DATE,CreationTime)AS [Datetime to Date CONVERT],
+  CONVERT(VARCHAR, CreationTime, 32)AS [USA Std.Style:32],
+  CONVERT(VARCHAR, CreationTime, 34)AS [EURO Std.Style:34]
+  FROM Sales.Orders
+
+
+  --Data Aggregations
+
+  SELECT
+  FORMAT(OrderDate, 'MM yy') OrderDate,
+  COUNT(*)
+  FROM Sales.Orders
+  GROUP BY FORMAT(OrderDate,'MM yy')
+  
+  --show CreationTime using the following format:
+-- Day Wed Jan Q1 2025 12:34:56 PM
+SELECT
+OrderID,
+CreationTime,
+'DAY' + FORMAT(CreationTime,'ddd MMM') + 'Q' + 
+DATENAME(quarter, CreationTime) + '' + 
+FORMAT(CreationTime, 'yyyy hh:mm:ss tt')AS CustomeFormat
+FROM Sales.Orders
+
+/* Format & Casting
+1. CASTING(checking the data type from one to another)
+2. FORMAT()-formats a date or time value
+   syntax
+   FORMAT(value,format[,culture])
+   examples
+   FORMAT(OrderDate,'dd/MM/yyyyy')
+   FORMAT(OrderDate,'dd/MM/yyyy,'ja-JP')
+   FORMAT(1234.56, 'D','fr-FR')
+*/
+
+SELECT
+OrderID,
+CreationTime,
+FORMAT(CreationTime,'MM-dd-yyyy')USA_Format,
+FORMAT(CreationTime,'dd-MM-yyyy')EURO_Format,
+FORMAT(CreationTime,'dd')dd,
+FORMAT(CreationTime,'ddd')ddd,
+FORMAT(CreationTime,'dddd')dddd,
+FORMAT(CreationTime,'MM')MM,
+FORMAT(CreationTime,'MMM')MMM,
+FORMAT(CreationTime,'MMMM')MMMM
+FROM Sales.Orders
+
+
+/*
+    CAST()
+converts a value to a specified data type 
+     syntax
+CAST(value AS data_type)
+     example
+CAST('123' AS INT)
+CAST('2025-08-20' AS DATE)
+*/
+
+SELECT
+CAST('123' AS INT) AS [String to Int],
+CAST(123 AS VARCHAR) AS [Int to String],
+CAST('2025-08-20' AS DATE) AS [String to Date],
+CAST('2025-08-20' AS DATETIME2) AS [String to Datetime],
+CreationTime,
+CAST(CreationTime AS DATE) AS [Datetime to Date]
+FROM Sales.Orders
+
+/*
+     DATE CALCULATIONS
+DATEADD()
+adds or subtracts a specific time interval to/from a date
+         sytax
+         DATEADD(part,interval,date)
+         examples
+         DATEADD(year,2,OrderDate)
+         DATEADD(month,-4,OrderDate)
+*/
+SELECT
+     OrderID,
+     OrderDate,
+     DATEADD(month,3,OrderDate)AS ThreeMonthsLater,
+     DATEADD(year,2,OrderDate)AS TwoYearsLater,
+     DATEADD(day,-10,OrderDate)AS TenDaysBefore
+FROM Sales.Orders
+
+/*
+     DATEDIFF()
+finds the difference between two dates.
+     syntax
+     DATEDIFF(year,start_date,end_date)
+     examples
+     DATEDIFF(year,OrderDate,ShipDate)
+     DATEDIFF(day,OrderDate,ShipDate)
+*/
+--calculate the age of employees
+SELECT
+     EmployeeID,
+     BirthDate,
+     DATEDIFF(year,BirthDate,GETDATE())Age
+FROM Sales.Employees
+
+--Find the shipping duration in days 
+SELECT
+    OrderID,
+    OrderDate,
+    ShipDate,
+    DATEDIFF(day,OrderDate,ShipDate)Day2Ship
+FROM Sales.Orders
+
+--Find the average shipping duration in days for each month.
+SELECT
+    MONTH(OrderDate)AS OrderDate,
+    AVG(DATEDIFF(day,OrderDate,ShipDate))AvShip
+FROM Sales.Orders
+GROUP BY MONTH(OrderDate)
+
+
+
