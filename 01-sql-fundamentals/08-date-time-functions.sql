@@ -266,4 +266,75 @@ FROM Sales.Orders
 GROUP BY MONTH(OrderDate)
 
 
+------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
+
+         
+/*
+      ISDATE()
+check if a value is a date
+returns 1 if the string value is avalid date
+      syntax
+ISDATE(value)
+      examples
+ISDATE('2025-08-20')
+ISDATE(2025)
+*/
+SELECT
+ISDATE('123')DateCheck1,
+ISDATE('2025-08-20')DateCheck2,
+ISDATE('20-08-2025')DateCheck3,
+ISDATE('2025')DateCheck4,
+ISDATE('08')DateCheck5
+
+
+--     APPLICATION OF ISDATE()
+SELECT
+   --CAST(OrderDate AS DATE)OrderDate,
+   OrderDate,
+   ISDATE(OrderDate),
+   CASE WHEN ISDATE(OrderDate) =1 THEN CAST(OrderDate AS DATE)
+   ELSE '9999-01-01'
+   END NewOrderDate
+FROM
+  (
+  SELECT '2025-08-20' AS OrderDate UNION
+  SELECT '2025-08-21' UNION
+  SELECT '2025-08-23' UNION
+  SELECT '2025-08'
+  )t
+   
+
+
+/*
+              IS NULL
+  replaces 'NULL' with a specified value
+              syntax
+    ISNULL(Value, replacement_value)
+              example
+    ISNULL(Shipping_Adress,'unkwon')
+    ISNULL(Shipping_Adress, Billing_Address)
+
+              COALESCE()
+  returns the first non-null value from a list
+              syntax
+    COALESCE(value1,value2,value3,--)
+              examples
+    COALESCE(Shipping_Addres,'unknown')
+    COALESCE(Shipping_Address,Billing_Address)
+    COALSCE(Shipping_Address,Billing_Addres,'unkown')
+*/
+--        USE CASES OF IS NULL()
+      --#1.use case.
+      --Hande the NULL before doing data aggregation 
+--Find the average scores of the customer
+SELECT
+   CustomerID,
+   Score,
+   COALESCE(Score,0) Score2,
+   AVG(Score) OVER() AvgScores,
+   AVG(COALESCE(Score,0)) OVER () AvgScores2
+FROM Sales.Customers
+
+
 
