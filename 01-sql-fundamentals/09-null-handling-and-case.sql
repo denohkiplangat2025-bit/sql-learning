@@ -254,3 +254,102 @@ CASE
      ELSE 'Not Available'
 END GenderFullText
 FROM Sales.Employees
+
+=================================================================================================================================================
+--retrieve customers details with abbreviated country code.
+SELECT
+CustomerID,
+FirstName,
+LastName,
+Country,
+CASE 
+    WHEN Country = 'Germany' THEN 'DE'
+    WHEN Country =  'USA' THEN 'US'
+    ELSE 'n/a'
+END CountryAbbr
+FROM Sales.Customers;
+
+
+SELECT DISTINCT Country
+FROM Sales.Customers
+
+=================================================================================================================================================
+/*
+         syntax
+1. Full Form
+CASE 
+     WHEN Country = 'Germany' THEN 'DE'
+     WHEN Country = 'India' THEN 'IN'
+     WHEN Country = 'United States' THEN 'US'
+     WHEN Country = 'France' THEN 'FR'
+     WHEN Country = 'Italy' THEN 'IT'
+     ELSE 'n/a'
+END
+
+2. Quick Form
+ CASE  Country
+      WHEN 'Germany' THEN 'DE'
+      WHEN 'India' THEN 'IN'
+      WHEN 'United States' THEN 'US'
+      WHEN 'France' THEN 'FR'
+      WHEN 'Italy' THEN 'IT'
+      ELSE 'n/a'
+END
+*/
+
+=================================================================================================================================================
+
+/*
+#3. USE CASE
+   HANDLING NULLs
+replace NULLs with a specific value 
+NULLs can lead to inaccurate results, which can lead to wrong decision-making
+*/
+--find the average scores of ccustomers and treat NULLs as 0,
+--Additionally provide details such as CustomerID and LastName
+SELECT
+CustomerID,
+LastName,
+Score,
+CASE 
+    WHEN Score IS NULL THEN 0
+    ELSE Score
+END ScoreClean,
+
+AVG(CASE 
+        WHEN Score IS NULL THEN 0
+        ELSE Score
+    END) OVER () AvgCustomerClean,
+
+AVG(Score) OVER () AvgCustomer
+FROM Sales.Customers
+
+=================================================================================================================================================
+/*
+#4.USE CASE
+  CONDITIONAL AGGREGATION
+apply aggregate functions only on subsets of data that fulfill certain conditions.
+*/
+--count how many times each customer has made an order with sales greater than 30
+SELECT
+OrderID,
+CustomerID,
+Sales,
+CASE 
+    WHEN Sales > 30 THEN 1
+    ELSE 0
+END SalesFlag
+FROM Sales.Orders
+ORDER BY CustomerID;
+
+SELECT
+CustomerID,
+SUM(CASE 
+         WHEN Sales > 30 THEN 1
+         ELSE 0
+    END) TotalOrderHighSales,
+    COUNT(*) TotalOrders
+FROM Sales.Orders
+GROUP BY CustomerID
+
+===================================================================================================================================================
